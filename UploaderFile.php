@@ -8,7 +8,7 @@ class  UploaderFile{
     private $final_file_name;
     private $target_file;
 
-    /**getters and setters */
+    /**getters and setetrs */
     public function setOriginalName($name){
         $this->file_original_name = $name;
     
@@ -60,7 +60,7 @@ class  UploaderFile{
         if(move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $this->target_file)){
             echo" your file was uploaded successfully";
             return true;
-        }else{ echo" Sorry :( your file was not uploaded check it and try again ";return false; }
+        }else{ echo" Sorry :( your file was not uploaded, please try again ";return false; }
     }
     public function moveFile(){}
     public function fileTypeIsCorrect(){
@@ -84,7 +84,7 @@ class  UploaderFile{
     }
     public function fileWasSelected(){
     if(empty($_FILES["fileToUpload"])){
-        echo "please select a file first!";
+        echo "please select a file!";
         return false;
     }else{ return true; }
     }

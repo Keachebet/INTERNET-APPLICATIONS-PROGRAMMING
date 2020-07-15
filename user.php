@@ -1,31 +1,26 @@
 <?php
 include "Crud.php";
-include "authenticate.php";
+include "authenticae.php";
 include_once 'DBConnector.php';
 class User implements Crud{
     private $user_id;
     private $first_name;
     private $last_name;
     private $city_name;
-    private $utc_timestamp;
-    private $offset;
+
     private $username;
     private $password;
     private $profilePic;
 
 
 
-    function __construct($first_name,$last_name,$city_name,$username,
-    $password,$profilePic,$utc_timestamp,$offset)
-    {
+    function __construct($first_name,$last_name,$city_name,$username,$password,$profilePic){
         $this->first_name = $first_name;
         $this->last_name = $last_name;
         $this->city_name = $city_name;
         $this->username = $username;
         $this->password = $password;
         $this->profilePic = $profilePic;
-        $this->utc_timestamp = $utc_timestamp;
-        $this->offset = $offset;
     }
 
 
@@ -48,25 +43,11 @@ class User implements Crud{
     }
 
     public function setUserId($user_id){
-        $this->user_id = $user_id;
+        $this->user_id = user_id;
     }
 
     public function getUserId(){
-        return $this->user_id;
-    }
-    public function setUtc_timestamp($utc_timestamp){
-        $this->utc_timestamp = $utc_timestamp;
-    }
-
-    public function getUtc_timestamp(){
-        return $this->utc_timestamp;
-    }
-    public function setOffset($offset){
-        $this->offset = $offset;
-    }
-
-    public function getOffset(){
-        return $this->offset;
+        return $this->$user_id;
     }
     public function isUserExist($uname){
         $con = new DBConnector;
@@ -93,14 +74,11 @@ class User implements Crud{
         $this->hashPassword();
         $pass = $this->password;
         $pic = $this->profilePic;
-        $utc = $this->utc_timestamp;
-        $offset = $this->offset;
         try{
-        $stmt = $connection->prepare("INSERT INTO user(first_name,last_name,
-        user_city,username,password,file,utc_stamp,offset)
-         VALUES (?,?,?,?,?,?,?,?)");
+        $stmt = $connection->prepare("INSERT INTO user(first_name,last_name,user_city,username,password,file)
+         VALUES (?,?,?,?,?,?)");
 
-        $stmt->execute(array($fn,$ln,$city,$uname,$pass,$pic,$utc,$offset));
+        $stmt->execute(array($fn,$ln,$city,$uname,$pass,$pic));
         $found = true;
         $stmt = null;
         }catch(Exception $e){
@@ -161,7 +139,7 @@ class User implements Crud{
                 $stmt = $mysqli->prepare("SELECT password,username FROM user");
                 $stmt->execute();
                 $result = $stmt->fetchAll();
-                 // result/output data of each row
+                 // results/output data of each row
                  foreach($result as $row){ 
                     if(password_verify($this->getPassword(),$row['password']) && $this->getUsername()==$row['username']){
                         $found = true;
