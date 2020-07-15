@@ -13,8 +13,6 @@ class DBConnector{
     $dbname = 'btc3205';
         try{
         $this->conn = new PDO("mysql:host=$dbserver;dbname=$dbname", DB_USER, DB_PASS);
-
-
         $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         }catch(PDOException $e){
@@ -27,8 +25,6 @@ class DBConnector{
         $this->conn=null;
     }
 }
-
-
 
 
 ?>

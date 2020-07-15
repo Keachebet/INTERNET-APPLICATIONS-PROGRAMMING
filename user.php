@@ -1,6 +1,6 @@
 <?php
 include "Crud.php";
-include "authenticae.php";
+include "authenticate.php";
 include_once 'DBConnector.php';
 class User implements Crud{
     private $user_id;
@@ -10,17 +10,15 @@ class User implements Crud{
 
     private $username;
     private $password;
-    private $profilePic;
 
 
-
-    function __construct($first_name,$last_name,$city_name,$username,$password,$profilePic){
+    function __construct($first_name,$last_name,$city_name,$username,$password){
         $this->first_name = $first_name;
         $this->last_name = $last_name;
         $this->city_name = $city_name;
         $this->username = $username;
         $this->password = $password;
-        $this->profilePic = $profilePic;
+
     }
 
 
@@ -73,12 +71,11 @@ class User implements Crud{
         $uname = $this->username;
         $this->hashPassword();
         $pass = $this->password;
-        $pic = $this->profilePic;
         try{
-        $stmt = $connection->prepare("INSERT INTO user(first_name,last_name,user_city,username,password,file)
-         VALUES (?,?,?,?,?,?)");
+        $stmt = $connection->prepare("INSERT INTO user(first_name,last_name,user_city,username,password)
+         VALUES (?,?,?,?,?)");
 
-        $stmt->execute(array($fn,$ln,$city,$uname,$pass,$pic));
+        $stmt->execute(array($fn,$ln,$city,$uname,$pass));
         $found = true;
         $stmt = null;
         }catch(Exception $e){
