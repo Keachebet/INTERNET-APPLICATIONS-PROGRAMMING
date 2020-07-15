@@ -1,5 +1,3 @@
-//we create a function to validate our form
-//we will call the function when the form is submited
 
 function validateForm(){
     var fname = document.forms["user_details"]["first_name"].value;
@@ -8,7 +6,7 @@ function validateForm(){
 
 //user_details is the nameof our form
     if (fname == ""||lname == ""||city == ""){
-        alert("all details required "+fname);
+        alert("all required details were not provided"+fname);
         return false;
     }
     return true;

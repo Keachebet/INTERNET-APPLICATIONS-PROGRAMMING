@@ -7,18 +7,25 @@ class User implements Crud{
     private $first_name;
     private $last_name;
     private $city_name;
-
+    private $utc_timestamp;
+    private $offset;
     private $username;
     private $password;
+    private $profilePic;
 
 
-    function __construct($first_name,$last_name,$city_name,$username,$password){
+
+    function __construct($first_name,$last_name,$city_name,$username,
+    $password,$profilePic,$utc_timestamp,$offset)
+    {
         $this->first_name = $first_name;
         $this->last_name = $last_name;
         $this->city_name = $city_name;
         $this->username = $username;
         $this->password = $password;
-
+        $this->profilePic = $profilePic;
+        $this->utc_timestamp = $utc_timestamp;
+        $this->offset = $offset;
     }
 
 
@@ -41,29 +48,43 @@ class User implements Crud{
     }
 
     public function setUserId($user_id){
-        $this->user_id = user_id;
+        $this->user_id = $user_id;
     }
 
     public function getUserId(){
-        return $this->$user_id;
+        return $this->user_id;
+    }
+    public function setUtc_timestamp($utc_timestamp){
+        $this->utc_timestamp = $utc_timestamp;
+    }
+
+    public function getUtc_timestamp(){
+        return $this->utc_timestamp;
+    }
+    public function setOffset($offset){
+        $this->offset = $offset;
+    }
+
+    public function getOffset(){
+        return $this->offset;
     }
     public function isUserExist($uname){
-        $found = false;
         $con = new DBConnector;
-
-        $res = mysqli_query($con->conn,"SELECT * FROM user") or die("Error ".mysqli_error($con->conn));
-
-                // output/result for each row
-                while($row = mysqli_fetch_array($res)) { 
-                    if($row['username']==$uname){
-                        $found=true;
-                    }
-                }
-                return $found;
+        $mysqli = $con->conn;
+        $exist = true;
+        $stmt = $mysqli->prepare("SELECT * FROM user where username=?");
+        $stmt->execute(array($uname));
+        if(empty($stmt->fetch())){
+            $exist=false;
+        }
+        
+        return $exist;
     }
 
     public function save(){
         $con = new DBConnector;
+        $connection = $con->conn;
+        $found = false;
 
         $fn = $this->first_name;
         $ln = $this->last_name;
@@ -71,15 +92,33 @@ class User implements Crud{
         $uname = $this->username;
         $this->hashPassword();
         $pass = $this->password;
-        
-        $res = mysqli_query($con->conn,"INSERT INTO user(first_name,last_name,user_city,username,password)
-         VALUES('$fn','$ln','$city','$uname','$pass')") or die("Error ".mysqli_error($con->conn));
-        $con->closeDatabase();
-        return $res;
+        $pic = $this->profilePic;
+        $utc = $this->utc_timestamp;
+        $offset = $this->offset;
+        try{
+        $stmt = $connection->prepare("INSERT INTO user(first_name,last_name,
+        user_city,username,password,file,utc_stamp,offset)
+         VALUES (?,?,?,?,?,?,?,?)");
+
+        $stmt->execute(array($fn,$ln,$city,$uname,$pass,$pic,$utc,$offset));
+        $found = true;
+        $stmt = null;
+        }catch(Exception $e){
+            echo"An error occured";
+        }
+        return $found;
     }
     public static function readAll(){
         $con = new DBConnector;
-        $res = mysqli_query($con->conn,"SELECT * FROM user") or die("Error ".mysqli_error($con->conn));
+        $mysqli = $con->conn;
+        try{
+        $stmt = $mysqli->prepare("SELECT * FROM user");
+        $stmt->execute();
+        $res = $stmt->fetchAll();
+        $stmt=null;
+        }catch(Exception $e){
+            echo"An error occured: ".$e;
+        }
         $con->closeDatabase();
         return $res;
     }
@@ -115,15 +154,23 @@ class User implements Crud{
         }
         public function isPasswordCorrect(){
             $con = new DBConnector;
+            $mysqli = $con->conn;
             $found = false;
-            $res = mysqli_query($con->conn,"SELECT * FROM user") or die("Error ".mysqli_error($con->conn));
 
-                // output data of each row
-                while($row = mysqli_fetch_array($res)) { 
+            try{
+                $stmt = $mysqli->prepare("SELECT password,username FROM user");
+                $stmt->execute();
+                $result = $stmt->fetchAll();
+                 // result/output data of each row
+                 foreach($result as $row){ 
                     if(password_verify($this->getPassword(),$row['password']) && $this->getUsername()==$row['username']){
                         $found = true;
                     }
                        }
+                $stmt=null;
+                }catch(Exception $e){
+                    echo"An error occured: ".$e;
+                }
                     $con->closeDatabase();
                     return $found;
                 }

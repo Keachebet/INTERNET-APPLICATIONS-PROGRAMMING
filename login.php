@@ -19,7 +19,7 @@ if(isset($_POST['btn-login'])){
         $instance->createUserSession();
     }else{
         $con->closeDatabase();
-        header("Location:login.php");
+        header("Location:lab1.php");
     }
     }else{
     }
